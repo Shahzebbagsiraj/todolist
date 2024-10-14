@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Flat To-Do List</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        :root {
+            --background-light: #f0f4f8;
+            --background-dark: #1e1e2f;
+            --card-bg-light: #ffffff;
+            --card-bg-dark: #2c2c43;
+            --text-color-light: #333333;
+            --text-color-dark: #ffffff;
+            --primary-color: #4CAF50;
+            --secondary-color: #FF5722;
+            --accent-color: #2196F3;
+            --button-bg-light: #4CAF50;
+            --button-bg-dark: #FF5722;
+            --delete-bg-light: #FF5722;
+            --delete-bg-dark: #4CAF50;
+            --input-bg-light: #f9f9f9;
+            --input-bg-dark: #3a3a59;
+            --box-shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --box-shadow-dark: 0 4px 6px rgba(0, 0, 0, 0.5);
+            --modal-bg-light: rgba(255, 255, 255, 0.95);
+            --modal-bg-dark: rgba(0, 0, 0, 0.95);
+            --button-hover-bg: #e63946;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--background-light);
+            color: var(--text-color-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.5s ease, color 0.5s ease;
+            position: relative;
+        }
+
+        body.dark-mode {
+            background: var(--background-dark);
+            color: var(--text-color-dark);
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color-light);
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: var(--text-color-dark);
+        }
+
+        .container {
+            background: var(--card-bg-light);
+            box-shadow: var(--box-shadow-light);
+            border-radius: 12px;
+            padding: 30px 25px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transition: background 0.5s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        body.dark-mode .container {
+            background: var(--card-bg-dark);
+            box-shadow: var(--box-shadow-dark);
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            transition: color 0.5s ease;
+        }
+
+        body.dark-mode h2 {
+            color: var(--text-color-dark);
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            padding: 12px 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            background-color: var(--input-bg-light);
+            color: var(--text-color-light);
+            transition: background 0.5s ease, color 0.5s ease, border 0.3s ease;
+        }
+
+        body.dark-mode input[type="text"] {
+            background-color: var(--input-bg-dark);
+            color: var(--text-color-dark);
+            border: 2px solid var(--secondary-color);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        .add-task-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+
+        body.dark-mode .add-task-button {
+            background-color: var(--secondary-color);
+        }
+
+        .add-task-button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-2px);
+        }
+
+        .add-task-button:active {
+            transform: translateY(0);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        li {
+            background-color: var(--input-bg-light);
+            padding: 12px 15px;
+            margin-top: 10px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: var(--box-shadow-light);
+        }
+
+        body.dark-mode li {
+            background-color: var(--input-bg-dark);
+            box-shadow: var(--box-shadow-dark);
+        }
+
+        body.dark-mode li:hover {
+            background-color: #FF5722;
+        }
+
+        li:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .delete {
+            background-color: var(--delete-bg-light);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        body.dark-mode .delete {
+            background-color: var(--delete-bg-dark);
+        }
+
+        .delete:hover {
+            background-color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .delete:active {
+            transform: scale(1);
+        }
+
+        /* Scrollbar Styling */
+        ul::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ul::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        body.dark-mode ul::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ul::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        body.dark-mode ul::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 500px;
+            }
+
+            h2 {
+                font-size: 1.8em;
+            }
+
+            .add-task-button {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+
+            .delete {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 25px 20px;
+                max-width: 90%;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            .add-task-button {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+
+            .delete {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            h2 {
+                font-size: 1.4em;
+            }
+
+            input[type="text"] {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+
+            .add-task-button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .delete {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    </div>
+    <div class="container">
+        <h2>My To-Do List</h2>
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="Add a new task">
+            <button class="add-task-button" onclick="addTask()">Add Task</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        const themeToggleBtn = document.querySelector('.theme-toggle');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggleBtn.textContent = '☀️';
+        } else {
+            themeToggleBtn.textContent = '🌙';
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggleBtn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggleBtn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        window.onload = function() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => {
+                createTaskElement(task);
+            });
+        }
+
+        function addTask() {
+            let taskInput = document.getElementById('taskInput');
+            let taskText = taskInput.value.trim();
+            if (taskText === '') {
+                alert("Please enter a task.");
+                return;
+            }
+            createTaskElement(taskText);
+            saveTask(taskText);
+            taskInput.value = '';
+        }
+
+        function createTaskElement(taskText) {
+            let taskList = document.getElementById('taskList');
+            let li = document.createElement('li');
+
+            let span = document.createElement('span');
+            span.textContent = taskText;
+
+            let deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.className = 'delete';
+            deleteBtn.onclick = function() {
+                deleteTask(this, taskText);
+            };
+
+            li.appendChild(span);
+            li.appendChild(deleteBtn);
+            taskList.appendChild(li);
+        }
+
+        function saveTask(task) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function deleteTask(button, taskText) {
+            let li = button.parentElement;
+            li.remove();
+            removeTaskFromStorage(taskText);
+        }
+
+        function removeTaskFromStorage(taskText) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks = tasks.filter(task => task !== taskText);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+    </script>
+</body>
+</html>
